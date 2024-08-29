@@ -6,3 +6,5 @@ rewritten again in an object-oriented programming style. It was a quick
 hack, and it needs a lot of cleanup and refactoring. A perfect code base to teach
 the value of software developement fundamentals!
 <br>
+
+This is the updated page for HW0 for CS2820 it has the Excel Documents as well as the stress test!
