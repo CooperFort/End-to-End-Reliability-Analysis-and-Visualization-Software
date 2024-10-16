@@ -92,3 +92,14 @@ My first test ensures that the method correctly orders the initially existing fl
 <br>
 <br>getNodeNamesOrderedAlphabeticallyTest
 <br>getNodeNamesOrderedAlphabeticallyAdditionalFlowsTest
+
+<br>
+10/15/2024 Added UML Diagrams for 
+<br> 
+ScheduleObject
+WorkLoad
+Reliability
+<br>
+Also added method getReliabilities 
+End of Changes 
+<br>
