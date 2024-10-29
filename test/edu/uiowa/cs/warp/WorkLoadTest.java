@@ -436,3 +436,4 @@ public class WorkLoadTest {
 		assertEquals(5, txAttemptsFlow2.length, "The array size for F5 should match the number of links minus the total cost.");
 	}
 }
+

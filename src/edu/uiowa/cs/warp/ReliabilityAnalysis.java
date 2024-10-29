@@ -1,5 +1,7 @@
 package edu.uiowa.cs.warp;
 
+import java.util.ArrayList;
+
 /**
  * ReliabilityAnalysis analyzes the end-to-end reliability of messages transmitted in flows for the
  * WARP system.
@@ -38,22 +40,96 @@ package edu.uiowa.cs.warp;
  * @version 1.8 Fall 2024
  *
  */
+
 public class ReliabilityAnalysis {
-  // TODO Auto-generated class
-public ReliabilityTable getReliabilities() {
-      // TODO implement this operation
-      throw new UnsupportedOperationException("not implemented");
-   }
-   
+    private double e2e;
+    private double minPacketReceptionRate;
+    private int numFaults;
 
+    // Constructor with e2e and minPacketReceptionRate
+    public ReliabilityAnalysis(Double e2e, Double minPacketReceptionRate) {
+        this.e2e = (e2e != null) ? e2e : 0.99;
+        this.minPacketReceptionRate = (minPacketReceptionRate != null) ? minPacketReceptionRate : 0.9;
+    }
 
-  public ReliabilityAnalysis(Program program) {
-    // TODO Auto-generated constructor stub
-  }
+    // Constructor with numFaults
+    public ReliabilityAnalysis(Integer numFaults) {
+        this.numFaults = (numFaults != null) ? numFaults : 0;
+    }
 
-  public Boolean verifyReliabilities() {
-    // TODO Auto-generated method stub
-    return true;
-  }
+    /**
+     * Calculates transmissions per link and total transmission cost.
+     * @param flow The flow to analyze.
+     * @return ArrayList containing transmission results.
+     */
+    public ArrayList<Integer> numTxPerLinkAndTotalTxCost(Flow flow) {
+        ArrayList<Integer> txResults = new ArrayList<>();
 
+        if (numFaults > 0) {
+            txResults = getFixedTxPerLinkAndTotalTxCost(flow);
+        } else {
+            txResults = numTxAttemptsPerLinkAndTotalTxAttempts(flow, e2e, minPacketReceptionRate, false);
+        }
+
+        return txResults;
+    }
+
+    private ArrayList<Integer> getFixedTxPerLinkAndTotalTxCost(Flow flow) {
+        int nNodesInFlow = flow.nodes.size();
+        int numEdgesInFlow = nNodesInFlow - 1;
+        int maxFaultsInFlow = numEdgesInFlow * numFaults;
+        ArrayList<Integer> txPerLink = new ArrayList<>();
+
+        for (int i = 0; i < nNodesInFlow; i++) {
+            txPerLink.add(numFaults + 1);
+        }
+
+        txPerLink.add(numEdgesInFlow + maxFaultsInFlow);
+        return txPerLink;
+    }
+
+    private ArrayList<Integer> numTxAttemptsPerLinkAndTotalTxAttempts(Flow flow, Double e2e, Double M, boolean optimizationRequested) {
+        int nNodesInFlow = flow.nodes.size();
+        int nHops = nNodesInFlow - 1;
+        ArrayList<Integer> nPushesArrayList = new ArrayList<>();
+        for (int i = 0; i <= nNodesInFlow; i++) {
+            nPushesArrayList.add(0);
+        }
+
+        double minLinkReliabilityNeeded = Math.max(e2e, Math.pow(e2e, 1.0 / nHops));
+        ArrayList<Double> currentReliabilityRow = new ArrayList<>(nNodesInFlow);
+        for (int i = 0; i < nNodesInFlow; i++) {
+            currentReliabilityRow.add(0.0);
+        }
+        currentReliabilityRow.set(0, 1.0);
+
+        int timeSlot = 0;
+        double e2eReliabilityState = 0.0;
+
+        while (e2eReliabilityState < e2e) {
+            ArrayList<Double> prevReliabilityRow = new ArrayList<>(currentReliabilityRow);
+
+            for (int nodeIndex = 0; nodeIndex < nHops; nodeIndex++) {
+                double prevSrcNodeState = prevReliabilityRow.get(nodeIndex);
+                double prevSnkNodeState = prevReliabilityRow.get(nodeIndex + 1);
+                double nextSnkState;
+
+                if (prevSnkNodeState < minLinkReliabilityNeeded && prevSrcNodeState > 0) {
+                    nextSnkState = (1 - M) * prevSnkNodeState + M * prevSrcNodeState;
+                    nPushesArrayList.set(nodeIndex, nPushesArrayList.get(nodeIndex) + 1);
+                } else {
+                    nextSnkState = prevSnkNodeState;
+                }
+
+                currentReliabilityRow.set(nodeIndex + 1, nextSnkState);
+            }
+
+            e2eReliabilityState = currentReliabilityRow.get(nHops);
+            timeSlot++;
+        }
+
+        nPushesArrayList.set(nNodesInFlow, timeSlot);
+        return nPushesArrayList;
+    }
 }
+
