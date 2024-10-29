@@ -35,27 +35,27 @@ This project focuses on refactoring the WARP code to enhance modularity, specifi
 - The project followed the Google Java Style Guide for naming conventions and code structure.
 - Comprehensive JavaDoc comments were added to all new methods, constructors, and updated existing comments.
   - Changed 
-      ArrayList<Integer> linkTxAndTotalCost = getFixedTxPerLinkAndTotalTxCost(flowNode);
-      flowNode.linkTxAndTotalCost = linkTxAndTotalCost;
+      `ArrayList<Integer> linkTxAndTotalCost = getFixedTxPerLinkAndTotalTxCost(flowNode);`
+      `flowNode.linkTxAndTotalCost = linkTxAndTotalCost;`
     to 
-      ReliabilityAnalysis ra = new ReliabilityAnalysis(e2e, minPacketReceptionRate);
-      ArrayList<Integer> linkTxAndTotalCost = ra.numTxPerLinkAndTotalTxCost(flowNode);
-      flowNode.linkTxAndTotalCost = linkTxAndTotalCost;
+      `ReliabilityAnalysis ra = new ReliabilityAnalysis(e2e, minPacketReceptionRate);`
+      `ArrayList<Integer> linkTxAndTotalCost = ra.numTxPerLinkAndTotalTxCost(flowNode);`
+      `flowNode.linkTxAndTotalCost = linkTxAndTotalCost;`
   - Changed
-      ArrayList<Integer> linkTxAndTotalCost =
-      numTxAttemptsPerLinkAndTotalTxAttempts(flowNode, e2e, m, true);
-      flowNode.linkTxAndTotalCost = linkTxAndTotalCost;
+      `ArrayList<Integer> linkTxAndTotalCost =`
+      `numTxAttemptsPerLinkAndTotalTxAttempts(flowNode, e2e, m, true);`
+      `flowNode.linkTxAndTotalCost = linkTxAndTotalCost;`
     to
-      ReliabilityAnalysis ra = new ReliabilityAnalysis(numFaults);
-      ArrayList<Integer> linkTxAndTotalCost = ra.numTxPerLinkAndTotalTxCost(flowNode);
-      flowNode.linkTxAndTotalCost = linkTxAndTotalCost;
+      `ReliabilityAnalysis ra = new ReliabilityAnalysis(numFaults);`
+      `ArrayList<Integer> linkTxAndTotalCost = ra.numTxPerLinkAndTotalTxCost(flowNode);`
+      `flowNode.linkTxAndTotalCost = linkTxAndTotalCost;`
 - Implemented by **Cooper Fort**.
 
 ### 4. Class Diagrams
 - Updated UML class diagrams to reflect the new methods, constructors, and overall changes.
 - Screenshots of the updated diagrams were taken and saved.
-  - HW5ReliabilityAnalysis.png
-  - HW5WorkLoad.png
+  - `HW5ReliabilityAnalysis.png`
+  - `HW5WorkLoad.png`
 - Implemented by **Jeff Bates**.
 
 ## UML and JavaDoc
