@@ -1,105 +1,49 @@
-# CS2820 Fall 2024 WARP Project Code
+# CS 2820 Homework 5 - WARP Code Refactoring
 
-This code base will be used for the University of Iowa CS 2820 Introduction to Software
-Development course. The code was developed by Steve Goddard for the WARP sensor network 
-research project. It was first written in Swift and rewritten in Java. It was then 
-rewritten again in an object-oriented programming style. It was a quick
-hack, and it needs a lot of cleanup and refactoring. A perfect code base to teach
-the value of software development fundamentals!
-<br>
-<br>
-Adding arguments to the Run Configuration allows you to execute more with your code. 
--i gives an input file and -o an output. -v is verbose, -sch priority is the priority 
-scheduler, and --all runs all options. Whenever using --all, you will want to use -sch 
-priority or change Warp to not run every option in the --all, otherwise, you will end up 
-with a load of files. 
-<br>
-<br>
-Java Doc comments made by jcbates: Workload.java, Flow.java, ProgramVisualization, and Program.java
-<br>
-<br>
-Java Doc comments made by klookingbill: Warp.java and VisualizationImplementation.java  
-10/8/2024
-<br>
-# **Junit Tests Completed by jcbates:**
-### Tests for setFlowDeadline()
-testSetFlowDeadlineUpdateExistingFlow 
-<br>testSetFlowDeadlineValidFlow
+## Project Overview
+This project focuses on refactoring the WARP code to enhance modularity, specifically by implementing the `numTxPerLinkAndTotalTxCost()` method in the `ReliabilityAnalysis` class. Additional constructors were added, and existing methods in `WorkLoad.java` were removed or replaced. The project follows object-oriented principles, aiming for clear documentation and maintainable code.
 
-### Tests for getFlowDeadline()
-<br>testGetFlowDeadlineInvalidFlow
-<br>testGetFlowDeadlineValidFlow
+## Contributors
+- **Cooper Fort** 
+- **Jeff Bates** 
 
-### Tests for testMaxFlowLength()
-<br>testMaxFlowLengthNoFlows 
-<br>testMaxFlowLengthStressTest4
+## Key Changes
+- **ReliabilityAnalysis Class**: Added constructors and methods to handle dynamic and fixed transmission calculations.
+  - `public ReliabilityAnalysis(Double e2e, Double minPacketReceptionRate)`
+  - `public ReliabilityAnalysis(Integer numFaults)`
+  - `public ArrayList<Integer> numTxPerLinkAndTotalTxCost(Flow flow)`
+- **WorkLoad Class**: 
+  - Removed `numTxAttemptsPerLinkAndTotalTxAttempts()` and `getFixedTxPerLinkAndTotalTxCost()`.
+  - Replaced method calls with `numTxPerLinkAndTotalTxCost()` from `ReliabilityAnalysis`.
 
-### Tests for getHyperPeriod()
-<br>testGetHyperPeriodEmptyFlow
-<br>testGetHyperPeriodValidFlows
+## Refactoring Details
+### 1. `numTxPerLinkAndTotalTxCost()` Refactoring
+- The `numTxPerLinkAndTotalTxCost()` method was moved from `WorkLoad.java` to `ReliabilityAnalysis`.
+- It now serves as a public method and handles the same computation as the previously private methods `numTxAttemptsPerLinkAndTotalTxAttempts()` and `getFixedTxPerLinkAndTotalTxCost()`.
+- Uses `ArrayList<Integer>` instead of arrays, improving type safety and modularity.
+- Employs `ReliabilityRow` and `ReliabilityTable` classes for better structure.
+- Implemented by **Jeff Bates**.
 
-### Tests for getNodesInFlow()
-<br>testGetNodesInFlowNullFlow 
-<br>testGetNodesInFlowNonExistentFlow
-<br>testGetNodesInFlowValidFlowF1 
+### 2. New Constructors
+- Two new constructors were added to the `ReliabilityAnalysis` class:
+  - `ReliabilityAnalysis(Double e2e, Double minPacketReceptionRate)`
+  - `ReliabilityAnalysis(Integer numFaults)`
+- These constructors set up the attributes necessary for the refactored method and handle default values.
+- Implemented by **Cooper Fort**.
 
-### Tests for getNodesInFlow()
-<br>testGetNodeIndexExistingNode
-<br>testGetNodeIndexNonExistentNode
+### 3. Refactor Style/Naming/JavaDocs
+- The project followed the Google Java Style Guide for naming conventions and code structure.
+- Comprehensive JavaDoc comments were added to all new methods, constructors, and updated existing comments.
+- Implemented by **Cooper Fort**.
 
-### Tests for getFlowNames()
-<br>testGetFlowNamesEmpty
-<br>testGetFlowNames
-<br>
-<br>
-# **Junit Test Completed by klookingbill:**
-### Tests for addFlow()
-These tests check that the method can successfully add a non-existing flow to "StressTest4.txt" file, add a pre-existing flow to the file, and add multiple new flows to the file. 
-<br>
-<br>addFlowAddTest
-<br>addFlowOverridingTest
-<br>addFlowMultipleAddsTest
-### Tests for addNodeToFlow()
-These methods tests that a node that already exists in the "StressTest4.txt" file can successfully be added to a flow and that a node that does not already exist in the file is also correctly added to a flow.
-<br>
-<br>addNodeToFlowExistsTest
-<br>addNodeToFlowDoesntExistTest
-### Tests for getTotalTxAttemptsInFlow()
-These tests check that the total transmission attempts is correctly calculated for a single flow and for multiple nodes. 
-<br>
-<br>getTotalTxAttemptsInFlowOneFlowTest
-<br>getTotalTxAttemptsInFlowMultiFlowsTest
-### Tests for getFlowPriority()
-Because of the simplicity of this method, I have one test that makes sure the priority of a specified node is correctly computed.
-<br>
-<br>getFlowPriorityTest
-### Tests for setFlowPriority()
-My test checks that the priority of the given node is equal to the input of the given priority.
-<br>
-<br>setFlowPriorityTest
-### Tests for getFlowTxAttemptsPerLink()
-These tests check that the method correctly finds the priority of the specified flow and that it will also find the correct priority of an empty flow.
-<br>
-<br>getFlowTxAttemptsPerLinkTest
-<br>getFlowTxAttemptsPerLinkEmptyTest
-### Tests for setFlowsInRMorder()
-One of my tests checks that the method correctly orders the flows in a given file with just the flows in the file. The second test checks that the method still accurately orders the flows even when adding in new flows.
-<br>
-<br>setFlowsInRMorderCorrectOrderTest
-<br>setFlowsInRMorderAddFlowsTest
-### Tests for getNodeNamesOrderedAlphabetically()
-My first test ensures that the method correctly orders the initially existing flows in the file in alphabetical order. The second test checks that the method still orders correctly even when adding in new flows to the file. 
-<br>
-<br>getNodeNamesOrderedAlphabeticallyTest
-<br>getNodeNamesOrderedAlphabeticallyAdditionalFlowsTest
+### 4. Class Diagrams
+- Updated UML class diagrams to reflect the new methods, constructors, and overall changes.
+- Screenshots of the updated diagrams were taken and saved.
+- Implemented by **Jeff Bates**.
 
-<br>
-10/15/2024 Added UML Diagrams for 
-<br> 
-ScheduleObject
-WorkLoad
-Reliability
-<br>
-Also added method getReliabilities 
-End of Changes 
-<br>
+## UML and JavaDoc
+- **UML Diagrams**: Updated to include new methods and constructors in `ReliabilityAnalysis`.
+- **JavaDoc**: Generated for all public and private methods.
+
+
+

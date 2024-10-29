@@ -38,9 +38,8 @@ public class WarpSystem implements WarpInterface {
 
   @Override
   public ReliabilityAnalysis toReliabilityAnalysis() {
-    // TODO Auto-generated method stub
-    ra = new ReliabilityAnalysis(program);
-    return ra;
+      ra = new ReliabilityAnalysis(workLoad.getE2e(), workLoad.getMinPacketReceptionRate());
+      return ra;
   }
 
   @Override
@@ -65,11 +64,12 @@ public class WarpSystem implements WarpInterface {
 
   @Override
   public Boolean reliabilitiesMet() {
-    if (ra == null) {
-      ra = new ReliabilityAnalysis(program);
-    }
-    return ra.verifyReliabilities();
+      if (ra == null) {
+          ra = new ReliabilityAnalysis(workLoad.getE2e(), workLoad.getMinPacketReceptionRate());
+      }
+      return ra.verifyReliabilities();
   }
+
 
   @Override
   public Boolean deadlinesMet() {
