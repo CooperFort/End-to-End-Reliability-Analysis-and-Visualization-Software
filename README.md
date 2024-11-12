@@ -47,3 +47,29 @@ This project focuses on refactoring the WARP code to enhance modularity, specifi
 
 
 
+##CS 2820 Sprint1 - 
+##Jeff Bates
+- responsible for writing and updating the README.md file, outlining your high-level plan and status.
+
+##Cooper Fort 
+- Focus on creating the UML Sequence Diagram that shows the program flow starting from the Warp processing the 'ra' option
+- Use sequencediagram.org to create the diagram.
+- Ensure that the diagram clearly shows the sequence of interactions between program components.
+
+##Colin Miller
+- Worked closely with the sequence diagram designer to understand and implement the program logic for processing the 'ra' option in the Warp program.
+- Assisted in writing pseudocode snippets for testing and implementing the 'ra' option.
+- Document methods and flow in the README documents as needed. 
+
+##Yash Bandla
+- Write how the project will be tested and documented. 
+- Make sure the plan is clear.
+
+##Graham Besser
+- Make a class diagram and a project plan that lists tasks in order
+- Describes key methods for the Visualization class
+
+
+
+
+
