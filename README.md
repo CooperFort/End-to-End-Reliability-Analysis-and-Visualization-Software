@@ -46,28 +46,27 @@ This project focuses on refactoring the WARP code to enhance modularity, specifi
 - **JavaDoc**: Generated for all public and private methods.
 
 
+# CS 2820 - Sprint 1
 
-##CS 2820 Sprint1 - 
-##Jeff Bates
-- responsible for writing and updating the README.md file, outlining your high-level plan and status.
+### Jeff Bates
+- Responsible for writing and updating the README.md file, outlining the high-level plan and status.
 
-##Cooper Fort 
-- Focus on creating the UML Sequence Diagram that shows the program flow starting from the Warp processing the 'ra' option
-- Use sequencediagram.org to create the diagram.
-- Ensure that the diagram clearly shows the sequence of interactions between program components.
+### Cooper Fort
+- Focused on creating the UML Sequence Diagram that shows the program flow starting from the Warp processing the 'ra' option.
+- Used sequencediagram.org to create the diagram.
+- Ensured that the diagram clearly shows the sequence of interactions between program components.
 
-##Colin Miller
+### Colin Miller
 - Worked closely with the sequence diagram designer to understand and implement the program logic for processing the 'ra' option in the Warp program.
 - Assisted in writing pseudocode snippets for testing and implementing the 'ra' option.
-- Document methods and flow in the README documents as needed. 
+- Documented methods and flow in the README documents as needed.
 
-##Yash Bandla
-- Write how the project will be tested and documented. 
-- Make sure the plan is clear.
+### Yash Bandla
+- Wrote the testing and documentation plan to ensure a clear approach for validating the project.
 
-##Graham Besser
-- Make a class diagram and a project plan that lists tasks in order
-- Describes key methods for the Visualization class
+### Graham Besser
+- Created a class diagram and a project plan that lists tasks in order.
+- Described key methods for the Visualization class.
 
 
 
