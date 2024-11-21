@@ -21,6 +21,7 @@ public class ReliabilityVisualization  extends VisualizationObject {
 	
 	private static final String SOURCE_SUFFIX = ".ra";
 	private static final String OBJECT_NAME = "Reliability Analysis";
+	
 	private WarpInterface warp;
 	private ReliabilityAnalysis ra;
 	
@@ -29,6 +30,26 @@ public class ReliabilityVisualization  extends VisualizationObject {
 		this.warp = warp;
 		this.ra = warp.toReliabilityAnalysis();
 	}
+	
+	@Override
+	protected String[][] createVisualizationData() {
+		if (visualizationData == null) {
+			 ReliabilityTable reliabilityTable = ra.getReliabilities(warp.toProgram());
+			 
+			 int numRows = reliabilityTable.getNumRows();
+			 int numColumns = reliabilityTable.getNumColumns();
+			 visualizationData = new String[numRows][numColumns + 1];
+			 
+			 for (int row = 0; row < numRows; row++) {
+				 visualizationData[row][0] = String.format("%s", row);
+				 for (int column = 0; column < numColumns; column++) {
+					 visualizationData[row][column + 1] = String.valueOf(reliabilityTable.get(row, column));
+				 }
+			 }
+		}
+		return visualizationData;
+	}
+}
 	
 /* File Visualization for workload defined in Example.txt follows. 
  * Your output in the file ExamplePriority-0.9M-0.99E2E.ra
@@ -141,4 +162,3 @@ F0:A	F0:B	F0:C	F1:C	F1:B	F1:A
 1.0	0.999	0.9963	1.0	0.999	0.9963
 1.0	0.999	0.9963	1.0	0.999	0.9963
 */
-}
