@@ -16,4 +16,8 @@ public class ReliabilityRow extends Row<Double> {
 	ReliabilityRow (Double [] rowArray) {
 		super(rowArray);
 	}
+	
+	ReliabilityRow(ReliabilityRow other) {
+		super(other.toArray(new Double[0]));
+	}
 }
