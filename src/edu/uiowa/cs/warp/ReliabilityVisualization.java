@@ -1,5 +1,7 @@
 package edu.uiowa.cs.warp;
 
+import java.util.ArrayList;
+
 /**
  * ReliabilityVisualization creates the visualizations for
  * the reliability analysis of the WARP program. <p>
@@ -32,22 +34,64 @@ public class ReliabilityVisualization  extends VisualizationObject {
 	}
 	
 	@Override
+	public GuiVisualization displayVisualization() {
+		return new GuiVisualization(createTitle(), createColumnHeader(), createVisualizationData());
+	}
+	
+	@Override
+	protected Description createHeader() {
+		Description header = new Description();
+		
+		header.add(createTitle());
+		header.add(String.format("Scheduler Name: %s\n", warp.getSchedulerName()));
+		
+		int numFaults = warp.getNumFaults();
+		if (numFaults > 0) {
+			header.add(String.format("numFaults: %d\n", numFaults));
+		}
+		
+		header.add(String.format("M: %s\n", String.valueOf(warp.getMinPacketReceptionRate())));
+		header.add(String.format("E2E: %s\n", String.valueOf(warp.getE2e())));
+		header.add(String.format("nChannels: %d\n", warp.getNumChannels()));
+		
+		return header;
+	}
+	
+	@Override
+	protected String[] createColumnHeader() {
+		WorkLoad workLoad = warp.toWorkload();
+		ArrayList<String> flowsInOrder = workLoad.getFlowNamesInPriorityOrder();
+		
+		ArrayList<String> columnNames = new ArrayList<>();
+		for (String flow : flowsInOrder) {
+			for (String node : workLoad.getNodesInFlow(flow)) {
+				columnNames.add(flow + ":" + node);
+			}
+		}
+		
+		return columnNames.toArray(new String[0]);
+	}
+	
+	@Override
 	protected String[][] createVisualizationData() {
 		if (visualizationData == null) {
 			 ReliabilityTable reliabilityTable = ra.getReliabilities(warp.toProgram());
 			 
 			 int numRows = reliabilityTable.getNumRows();
 			 int numColumns = reliabilityTable.getNumColumns();
-			 visualizationData = new String[numRows][numColumns + 1];
+			 visualizationData = new String[numRows][numColumns];
 			 
 			 for (int row = 0; row < numRows; row++) {
-				 visualizationData[row][0] = String.format("%s", row);
 				 for (int column = 0; column < numColumns; column++) {
-					 visualizationData[row][column + 1] = String.valueOf(reliabilityTable.get(row, column));
+					 visualizationData[row][column] = String.valueOf(reliabilityTable.get(row, column));
 				 }
 			 }
 		}
 		return visualizationData;
+	}
+	
+	private String createTitle() {
+		return String.format("Reliability Analysis for graph %s\n", warp.getName());
 	}
 }
 	
