@@ -1,0 +1,337 @@
+Sprint 2 Sequence Diagram Code
+
+title WARP Diagram
+
+actor user
+
+user->Warp: main(new String[]{"gui", "ra"})
+activate Warp
+
+Warp->Warp:visualize(workLoad = warp, choice = SystemChoices.RELIABILITIES)
+activate Warp
+
+Warp->VisualizationFactory: viz = createVisualization(workLoad, outputDirectory = outputSubDirectory, choice)
+activate VisualizationFactory
+
+VisualizationFactory->VisualizationImplementation: viz = new VisualizationImplementation(warp = workLoad, outputDirectory, choice)
+activate VisualizationImplementation
+
+VisualizationImplementation->FileManager: fm = new FileManager()
+activate FileManager
+FileManager-->VisualizationImplementation: FileManager instance
+deactivate FileManager
+
+VisualizationImplementation->WarpInterface: workLoad = warp.toWorkLoad()
+activate WarpInterface
+note right of WarpInterface: TODO
+WarpInterface-->VisualizationImplementation: WorkLoad instance
+deactivate WarpInterface
+
+VisualizationImplementation->WorkLoadDescription: inputFileName = workLoad.getInputFileName()
+activate WorkLoadDescription
+WorkLoadDescription-->VisualizationImplementation: inputFileName
+deactivate WorkLoadDescription
+
+VisualizationImplementation->VisualizationImplementation: fileNameTemplate = createFileNameTemplate(outputDirectory)
+activate VisualizationImplementation
+
+VisualizationImplementation->FileManager: workingDirectory = fm.getBaseDirectory()
+activate FileManager
+FileManager-->VisualizationImplementation: baseDirectory
+deactivate FileManager
+
+VisualizationImplementation->FileManager: newDirectory = fm.createDirectory(directory = workingDirectory, subDirectory = outputDirectory)
+activate FileManager
+
+alt subDirectory.startsWith("/")
+FileManager->FileManager: newDirectory = subDirectory
+else
+FileManager->FileManager: newDirectory = directory + File.separator + subDirectory
+end
+
+FileManager->FileManager: path = Paths.get(newDirectory)
+FileManager->FileManager: Files.createDirectories(path)
+
+opt verbose
+FileManager->FileManager: System.out.println("Directory " + newDirectory + " is created!")
+end
+
+FileManager-->VisualizationImplementation: newDirectory
+deactivate FileManager
+
+alt inputFileName.contains("/")
+  VisualizationImplementation->VisualizationImplementation: index = inputFileName.lastIndexOf("/") + 1
+  VisualizationImplementation->VisualizationImplementation: fileNameTemplate = newDirectory + File.separator + inputFileName.substring(index)
+else
+  VisualizationImplementation->VisualizationImplementation: fileNameTemplate = newDirectory + File.separator + inputFileName;
+end
+
+VisualizationImplementation-->VisualizationImplementation: fileNameTemplate
+deactivate VisualizationImplementation
+
+VisualizationImplementation->ReliabilityVisualization: obj = new ReliabilityVisualization(warp)
+activate ReliabilityVisualization
+
+ReliabilityVisualization->ReliabilityAnalysis: reliabilityData = getReliabilities(warp.toProgram())
+activate ReliabilityAnalysis
+ReliabilityAnalysis-->ReliabilityVisualization: Reliability data
+deactivate ReliabilityAnalysis
+
+ReliabilityVisualization->WorkLoad: flows = getFlowNamesInPriorityOrder()
+activate WorkLoad
+WorkLoad-->ReliabilityVisualization: Flow names in priority order
+deactivate WorkLoad
+
+ReliabilityVisualization->WorkLoad: nodes = getNodesInFlow(flow)
+activate WorkLoad
+WorkLoad-->ReliabilityVisualization: Nodes in flow
+deactivate WorkLoad
+
+ReliabilityVisualization->FileManager: saveVisualization(fileContent)
+activate FileManager
+FileManager-->ReliabilityVisualization: File saved
+deactivate FileManager
+
+ReliabilityVisualization->GuiVisualization: displayVisualization()
+activate GuiVisualization
+GuiVisualization-->ReliabilityVisualization: GUI displayed
+deactivate GuiVisualization
+
+ReliabilityVisualization->FileManager: fileContent = createHeader()
+activate FileManager
+FileManager-->ReliabilityVisualization: Header created
+deactivate FileManager
+
+ReliabilityVisualization->FileManager: columnHeader = createColumnHeader()
+activate FileManager
+FileManager-->ReliabilityVisualization: Column header created
+deactivate FileManager
+
+ReliabilityVisualization->FileManager: visualizationData = createVisualizationData()
+activate FileManager
+FileManager-->ReliabilityVisualization: Visualization data created
+deactivate FileManager
+
+ReliabilityVisualization-->VisualizationImplementation: ReliabilityVisualization instance
+deactivate ReliabilityVisualization
+
+VisualizationImplementation->VisualizationImplementation: createVisualization(obj)
+activate VisualizationImplementation
+
+VisualizationImplementation->ReliabilityVisualization: visualization = obj.visualization()
+activate ReliabilityVisualization
+
+ReliabilityVisualization->VisualizationObject: visualization = super.visualization()
+activate VisualizationObject
+
+VisualizationObject->Description: content = new Description()
+activate Description
+Description->Description: super()
+Description->VisualizationObject: Description instance
+deactivate Description
+
+VisualizationObject->ReliabilityVisualization: data = createVisualizationData()
+activate ReliabilityVisualization
+note right of ReliabilityVisualization: TODO
+ReliabilityVisualization-->VisualizationObject: visualizationData
+deactivate ReliabilityVisualization
+
+VisualizationObject->ReliabilityVisualization: columnHeader = createColumnHeader()
+activate ReliabilityVisualization
+note right of ReliabilityVisualization: TODO
+ReliabilityVisualization-->VisualizationObject: String[] instance
+deactivate ReliabilityVisualization
+
+VisualizationObject->VisualizationObject: nodeString = String.join("\t", columnHeader) + "\\n"
+VisualizationObject->VisualizationObject: content.add(nodeString)
+
+loop rowIndex = 0; rowIndex < data.length; rowIndex++
+VisualizationObject->VisualizationObject: row = data[rowIndex]
+VisualizationObject->VisualizationObject: rowString = String.join("\t", row) + "\\n"
+VisualizationObject->VisualizationObject: content.add(rowString)
+end
+
+VisualizationObject-->ReliabilityVisualization: content
+deactivate VisualizationObject
+
+ReliabilityVisualization-->VisualizationImplementation: visualization
+deactivate ReliabilityVisualization
+
+VisualizationImplementation->ReliabilityVisualization: fileContent = obj.fileVisualization()
+activate ReliabilityVisualization
+
+ReliabilityVisualization->VisualizationObject: fileContent = super.fileVisualization()
+activate VisualizationObject
+
+VisualizationObject->ReliabilityVisualization: fileContent = createHeader()
+activate ReliabilityVisualization
+ReliabilityVisualization->Description: header = new Description()
+activate Description
+Description->Description: super()
+Description->ReliabilityVisualization: Description instance
+deactivate Description
+note right of ReliabilityVisualization: TODO
+ReliabilityVisualization-->VisualizationObject: header
+deactivate ReliabilityVisualization
+
+VisualizationObject->VisualizationObject: visualization = visualization()
+activate VisualizationObject
+
+VisualizationObject->Description: content = new Description()
+activate Description
+Description->Description: super()
+Description->VisualizationObject: Description instance
+deactivate Description
+
+VisualizationObject->ReliabilityVisualization: data = createVisualizationData()
+activate ReliabilityVisualization
+note right of ReliabilityVisualization: TODO
+ReliabilityVisualization-->VisualizationObject: visualizationData
+deactivate ReliabilityVisualization
+
+VisualizationObject->ReliabilityVisualization: columnHeader = createColumnHeader()
+activate ReliabilityVisualization
+note right of ReliabilityVisualization: TODO
+ReliabilityVisualization-->VisualizationObject: String[] instance
+deactivate ReliabilityVisualization
+
+VisualizationObject->VisualizationObject: nodeString = String.join("\t", columnHeader) + "\\n"
+VisualizationObject->VisualizationObject: content.add(nodeString)
+
+loop rowIndex = 0; rowIndex < data.length; rowIndex++
+VisualizationObject->VisualizationObject: row = data[rowIndex]
+VisualizationObject->VisualizationObject: rowString = String.join("\t", row) + "\\n"
+VisualizationObject->VisualizationObject: content.add(rowString)
+end
+
+VisualizationObject-->VisualizationObject: content
+deactivate VisualizationObject
+
+VisualizationObject->VisualizationObject: fileContent.addAll(visualization)
+
+VisualizationObject->ReliabilityVisualization: footer = createFooter()
+activate ReliabilityVisualization
+ReliabilityVisualization->Description: footer = new Description()
+activate Description
+Description->Description: super()
+Description->ReliabilityVisualization: Description instance
+deactivate Description
+note right of ReliabilityVisualization: TODO
+ReliabilityVisualization-->VisualizationObject: footer
+deactivate ReliabilityVisualization
+
+VisualizationObject->VisualizationObject: fileContent.addAll(footer)
+
+VisualizationObject-->ReliabilityVisualization: fileContent
+deactivate VisualizationObject
+
+ReliabilityVisualization-->VisualizationImplementation: fileContent
+deactivate ReliabilityVisualization
+
+VisualizationImplementation->ReliabilityVisualization: fileName = obj.createFile(fileNameTemplate)
+activate ReliabilityVisualization
+
+ReliabilityVisualization->VisualizationObject: fileString = super.createFile(fileNameTemplate, nameExtension, suffix)
+activate VisualizationObject
+
+VisualizationObject->FileManager: fileString = fm.createFile(file = fileNameTemplate, nameExtension, suffix)
+activate FileManager
+
+FileManager->FileManager: suffixIndex = file.lastIndexOf('.')
+FileManager->FileManager: fileString = file
+
+opt suffixIndex > 0
+FileManager->FileManager: fileString = file.substring(0, suffixIndex)
+end
+
+FileManager->FileManager: fileString = fileString + nameExtension + suffix
+
+opt verbose
+FileManager->FileManager: System.out.println("File " + fileString + " is created!")
+end
+
+FileManager-->VisualizationObject:
+deactivate FileManager
+
+VisualizationObject-->ReliabilityVisualization: fileString
+deactivate VisualizationObject
+
+ReliabilityVisualization-->VisualizationImplementation: fileString
+deactivate ReliabilityVisualization
+
+VisualizationImplementation->VisualizationImplementation: visualizationObject = obj
+deactivate VisualizationImplementation
+
+VisualizationImplementation-->VisualizationFactory: VisualizationImplementation instance
+deactivate VisualizationImplementation
+
+VisualizationFactory-->Warp: viz
+deactivate VisualizationFactory
+
+opt verbose
+Warp->VisualizationImplementation: vizString = viz.toString()
+activate VisualizationImplementation
+
+VisualizationImplementation->Description: vizString = visualization.toString()
+activate Description
+
+Description->Description: sb = new StringBuffer()
+loop row : this
+Description->Description: sb.append(row)
+end
+
+Description-->VisualizationImplementation: sb.toString()
+deactivate Description
+
+VisualizationImplementation-->Warp: vizString
+deactivate VisualizationImplementation
+
+Warp->Warp: System.out.println(vizString)
+end
+
+Warp->VisualizationImplementation: viz.toFile()
+activate VisualizationImplementation
+
+VisualizationImplementation->Description: fileString = fileContent.toString()
+activate Description
+
+Description->Description: sb = new StringBuffer()
+loop row : this
+Description->Description: sb.append(row)
+end
+
+Description-->VisualizationImplementation: sb.toString()
+deactivate Description
+
+VisualizationImplementation->FileManager: fm.writeFile(file = fileName, fileContents = fileString)
+activate FileManager
+FileManager->FileManager: fileName = Path.of(file)
+FileManager->FileManager: Files.writeString(fileName, fileContents)
+deactivate FileManager
+
+deactivate VisualizationImplementation
+
+Warp->VisualizationImplementation: viz.toDisplay()
+activate VisualizationImplementation
+
+VisualizationImplementation->ReliabilityAnalysis: window = visualizationObject.displayVisualization()
+activate ReliabilityAnalysis
+note right of ReliabilityAnalysis: TODO
+ReliabilityAnalysis-->VisualizationImplementation: GuiVisualization instance
+deactivate ReliabilityAnalysis
+
+VisualizationImplementation->GuiVisualization: window.setVisible()
+activate GuiVisualization
+GuiVisualization->GuiVisualization: frame.setVisible(true)
+deactivate GuiVisualization
+
+deactivate VisualizationImplementation
+
+deactivate Warp
+
+deactivate Warp
+
+
+
+
+
