@@ -1,8 +1,10 @@
 package edu.uiowa.cs.warp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -86,14 +88,121 @@ public class ReliabilityAnalysis {
     }
 
     /**
-     * Retrieves the reliability table containing the computed reliability values for each node in the flow over time.
+     * Retrieves the reliability table containing the computed reliability values for each node in the flows over time.
      *
      * @param program the {@code Program} containing the nodes to calculate reliability values for
      * @return a {@code ReliabilityTable} representing the reliability values
      */
     public ReliabilityTable getReliabilities(Program program) {
-        // TODO: Implement this method
-        throw new UnsupportedOperationException("Method not implemented yet");
+        // Retrieve the minimum packet reception rate (M)
+        double M = minPacketReceptionRate;
+
+        // Initialize the ReliabilityTable to store the reliability values over time
+        ReliabilityTable table = new ReliabilityTable();
+
+        // Convert the program to a WorkLoad to get flows and nodes
+        WorkLoad workLoad = program.toWorkLoad();
+        ArrayList<String> flowsInOrder = workLoad.getFlowNamesInPriorityOrder();
+
+        // Map to store nodes in each flow
+        Map<String, List<String>> nodesInFlows = new HashMap<>();
+        for (String flow : flowsInOrder) {
+            nodesInFlows.put(flow, Arrays.asList(workLoad.getNodesInFlow(flow)));
+        }
+
+        // Initialize the defaultRow with initial reliability values
+        ReliabilityRow defaultRow = new ReliabilityRow();
+        // Map to store the starting index of each flow in the defaultRow
+        Map<String, Integer> flowStartIndexes = new HashMap<>();
+
+        // Build the defaultRow and flowStartIndexes
+        int overallIndex = 0;
+        for (Map.Entry<String, List<String>> entry : nodesInFlows.entrySet()) {
+            String flowName = entry.getKey();
+            List<String> nodesInFlow = entry.getValue();
+
+            // The source node starts with reliability 1.0
+            defaultRow.add(1.0);
+            flowStartIndexes.put(flowName, overallIndex++);
+
+            // For the rest of the nodes in the flow, set initial reliability to 0.0
+            for (int i = 1; i < nodesInFlow.size(); i++) {
+                defaultRow.add(0.0);
+                overallIndex++;
+            }
+        }
+
+        // Create an instance of WarpDSL to parse instruction parameters
+        WarpDSL dsl = new WarpDSL();
+        // Get the schedule from the program
+        ProgramSchedule schedule = program.getSchedule();
+
+        // Get the number of time slots and nodes
+        int numRows = schedule.getNumRows();
+        int numColumns = schedule.getNumColumns();
+
+        // Iterate over each time slot
+        for (int timeSlot = 0; timeSlot < numRows; timeSlot++) {
+            // Get the previous reliability row or use defaultRow if first time slot
+            ReliabilityRow prevRow = (timeSlot > 0) ? table.get(timeSlot - 1) : defaultRow;
+            // Clone the previous row to update it for the current time slot
+            ReliabilityRow currRow = new ReliabilityRow(prevRow);
+
+            // Iterate over each node (column) in the schedule
+            for (int nodeColumn = 0; nodeColumn < numColumns; nodeColumn++) {
+                // Get the instruction parameters for the instruction at this time slot and node
+                var parameters = dsl.getInstructionParameters(schedule.get(timeSlot, nodeColumn));
+
+                // Iterate over the parameters
+                for (var parameter : parameters) {
+                    String instructionName = parameter.getName(); // e.g., "push", "pull", "wait", etc.
+                    if (instructionName.equals("push") || instructionName.equals("pull")) {
+                        String flowName = parameter.getFlow();
+                        if (!nodesInFlows.containsKey(flowName)) {
+                            continue; // Skip if the flow is not recognized
+                        }
+                        List<String> nodesInFlow = nodesInFlows.get(flowName);
+
+                        int flowStartIndex = flowStartIndexes.get(flowName);
+                        int srcNodeFlowIndex = nodesInFlow.indexOf(parameter.getSrc());
+                        int snkNodeFlowIndex = nodesInFlow.indexOf(parameter.getSnk());
+                        if (srcNodeFlowIndex == -1 || snkNodeFlowIndex == -1) {
+                            continue; // Skip if source or sink node is not found
+                        }
+
+                        int srcNodeIndex = flowStartIndex + srcNodeFlowIndex;
+                        int snkNodeIndex = flowStartIndex + snkNodeFlowIndex;
+
+                        // Get the previous reliability values
+                        double prevSrcReliability = prevRow.get(srcNodeIndex);
+                        double prevSnkReliability = prevRow.get(snkNodeIndex);
+
+                        // Handle the case when a new packet is injected at the source node
+                        if (instructionName.equals("push") && srcNodeFlowIndex == 0) {
+                            // Reset the source node's reliability to 1.0 (new packet injected)
+                            prevSrcReliability = 1.0;
+                            currRow.set(srcNodeIndex, 1.0);
+
+                            // Reset sink nodes' reliability to 0.0 for this flow (starting new transmission)
+                            for (int k = 1; k < nodesInFlow.size(); k++) {
+                                int nodeIndexInRow = flowStartIndex + k;
+                                currRow.set(nodeIndexInRow, 0.0);
+                            }
+                            // Since sink node reliability is reset, set prevSnkReliability to 0.0
+                            prevSnkReliability = 0.0;
+                        }
+
+                        // Update the sink node's reliability using the formula
+                        double newSnkReliability = (1 - M) * prevSnkReliability + M * prevSrcReliability;
+                        currRow.set(snkNodeIndex, newSnkReliability);
+                    }
+                }
+            }
+            // Add the updated row to the table
+            table.add(currRow);
+        }
+
+        return table;
     }
 
     /**
