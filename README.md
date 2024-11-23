@@ -62,7 +62,7 @@ This project focuses on creating code to analyze and visualize the reliability o
 ---
 
 ## ARTIFACTS
-1. **CS2820_Project ToDo**:
+1. **CS2820_Project ToDo Sprint2**:
    - Updated with Sprint 2 tasks for each team member, ensuring clear deliverables and deadlines.
 
 2. **Sprint 2.pdf**:
