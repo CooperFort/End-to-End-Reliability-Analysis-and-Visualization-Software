@@ -1,4 +1,9 @@
- package edu.uiowa.cs.warp;
+package edu.uiowa.cs.warp;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+//import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 
@@ -17,8 +22,8 @@ import java.util.ArrayList;
  * @version 1.8 Fall 2024
  *
  */
-public class ReliabilityVisualization  extends VisualizationObject {
 
+public class ReliabilityVisualization extends VisualizationObject {
 	// TODO Auto-generated class stub for unimplemented visualization
 	
 	private static final String SOURCE_SUFFIX = ".ra"; // The suffix for reliability analysis output files.
@@ -128,7 +133,7 @@ public class ReliabilityVisualization  extends VisualizationObject {
      * 
      * @return A string representing the visualization title
      */
-	private String createTitle() {
+	String createTitle() {
 		return String.format("Reliability Analysis for graph %s\n", warp.getName());
 	}
 }
