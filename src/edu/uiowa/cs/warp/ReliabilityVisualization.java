@@ -1,4 +1,4 @@
-package edu.uiowa.cs.warp;
+ package edu.uiowa.cs.warp;
 
 import java.util.ArrayList;
 
@@ -21,23 +21,42 @@ public class ReliabilityVisualization  extends VisualizationObject {
 
 	// TODO Auto-generated class stub for unimplemented visualization
 	
-	private static final String SOURCE_SUFFIX = ".ra";
-	private static final String OBJECT_NAME = "Reliability Analysis";
+	private static final String SOURCE_SUFFIX = ".ra"; // The suffix for reliability analysis output files.
+	private static final String OBJECT_NAME = "Reliability Analysis"; // The name of the visualization object. 
 	
-	private WarpInterface warp;
-	private ReliabilityAnalysis ra;
+	private WarpInterface warp;   // Interface for accessing WARP program data.
+	private ReliabilityAnalysis ra; // Reliability analysis object used for generating reliability data.
 	
+	/**
+     * Constructor for the ReliabilityVisualization class.
+     * Initializes the visualization with the given WARP interface and sets up 
+     * the reliability analysis data source.
+     * 
+     * @param warp The WARP interface providing access to program data
+     */
 	ReliabilityVisualization(WarpInterface warp) {
 		super(new FileManager(), warp, SOURCE_SUFFIX);
 		this.warp = warp;
 		this.ra = warp.toReliabilityAnalysis();
 	}
 	
+	/**
+     * Generates and displays a graphical visualization of reliability data using a GUI.
+     * 
+     * @return A GuiVisualization object containing the visualization data
+     */
 	@Override
 	public GuiVisualization displayVisualization() {
 		return new GuiVisualization(createTitle(), createColumnHeader(), createVisualizationData());
 	}
 	
+	/**
+     * Creates a header for the reliability visualization, including metadata 
+     * such as scheduler name, fault tolerance, minimum packet reception rate, 
+     * and end-to-end reliability.
+     * 
+     * @return A Description object containing the header information
+     */
 	@Override
 	protected Description createHeader() {
 		Description header = new Description();
@@ -57,6 +76,12 @@ public class ReliabilityVisualization  extends VisualizationObject {
 		return header;
 	}
 	
+	/**
+     * Creates the column headers for the reliability visualization. Each header 
+     * corresponds to a specific node in a flow, formatted as "FlowName:NodeName".
+     * 
+     * @return An array of column headers
+     */
 	@Override
 	protected String[] createColumnHeader() {
 		WorkLoad workLoad = warp.toWorkload();
@@ -72,6 +97,13 @@ public class ReliabilityVisualization  extends VisualizationObject {
 		return columnNames.toArray(new String[0]);
 	}
 	
+	/**
+     * Creates the visualization data matrix, representing reliability metrics 
+     * for nodes in the WARP system. The data is organized by rows (time slots) 
+     * and columns (nodes).
+     * 
+     * @return A 2D string array containing the reliability data
+     */
 	@Override
 	protected String[][] createVisualizationData() {
 		if (visualizationData == null) {
@@ -90,6 +122,12 @@ public class ReliabilityVisualization  extends VisualizationObject {
 		return visualizationData;
 	}
 	
+	/**
+     * Creates a title for the visualization, including the name of the graph 
+     * being analyzed.
+     * 
+     * @return A string representing the visualization title
+     */
 	private String createTitle() {
 		return String.format("Reliability Analysis for graph %s\n", warp.getName());
 	}
